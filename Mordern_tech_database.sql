@@ -246,3 +246,13 @@ VALUES
 (8, 160, 0, 56000.00),
 (9, 155, 5, 61500.00),
 (10, 162, 4, 57750.00);
+
+
+-- Insert into users table 
+INSERT INTO users
+(employee_id, username, password_hash, role)
+VALUES
+(1,'sibo.nkosi', 'Sibo123', 'EMPLOYEE'),
+(5, 'zanele.khumalo', 'Zanele456', 'EMPLOYEE'),
+(2, 'Lungi.manager', 'Manager789', 'MANAGER'),
+(10, 'Fatima.admin', 'HR123', 'HR');
