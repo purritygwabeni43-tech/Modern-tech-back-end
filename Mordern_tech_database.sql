@@ -5,7 +5,7 @@ CREATE TABLE departments (
 
 
 CREATE TABLE employees (
-    employee_id INT PRIMARY KEY,
+    employee_id INT PRIMARY KEY AUTO_INCREMENT, 
     name VARCHAR(100) NOT NULL,
     position VARCHAR(100) NOT NULL,
     department_id INT NOT NULL,
