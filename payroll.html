@@ -209,7 +209,12 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="auth.js"></script>
+<script>
+    requireRole(["EMPLOYEE", "MANAGER", "HR"]);
+</script>
   <script>
+
 
     // ==========================================
     // PAYROLL API
