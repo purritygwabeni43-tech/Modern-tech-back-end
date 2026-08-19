@@ -10,9 +10,47 @@
 USE modern_tech;
 
 -- ============================================
--- DROP OLD USERS TABLE IF IT EXISTS
+-- DROP OLD TABLES IF THEY EXIST (ORDER MATTERS)
 -- ============================================
+DROP TABLE IF EXISTS performance_reviews;
+DROP TABLE IF EXISTS payroll;
+DROP TABLE IF EXISTS leave_requests;
+DROP TABLE IF EXISTS attendance;
+DROP TABLE IF EXISTS employees;
+DROP TABLE IF EXISTS departments;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS roles;
+
+-- ============================================
+-- CREATE ROLES TABLE
+-- ============================================
+CREATE TABLE roles (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================
+-- CREATE USERS TABLE
+-- ============================================
+CREATE TABLE users (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role_id INT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_users_role
+        FOREIGN KEY (role_id)
+        REFERENCES roles(id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    
+    INDEX idx_users_email (email),
+    INDEX idx_users_role (role_id)
+);
 
 -- ============================================
 -- CREATE DEPARTMENTS TABLE
@@ -76,32 +114,17 @@ CREATE TABLE payroll (
 );
 
 -- ============================================
--- CREATE ROLES TABLE (NEW)
+-- CREATE PERFORMANCE REVIEWS TABLE (FIXED - MOVED BEFORE INSERT)
 -- ============================================
-CREATE TABLE roles (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    role_name VARCHAR(50) NOT NULL UNIQUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- ============================================
--- CREATE USERS TABLE (CORRECT VERSION)
--- ============================================
-CREATE TABLE users (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    full_name VARCHAR(100) NOT NULL,
-    email VARCHAR(150) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    role_id INT UNSIGNED NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_users_role
-        FOREIGN KEY (role_id)
-        REFERENCES roles(id)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-    INDEX idx_users_email (email),
-    INDEX idx_users_role (role_id)
+CREATE TABLE performance_reviews (
+    review_id INT PRIMARY KEY AUTO_INCREMENT,
+    employee_id INT NOT NULL,
+    review_date DATE NOT NULL,
+    score DECIMAL(3,1) CHECK (score >= 1 AND score <= 5),
+    feedback TEXT,
+    reviewer VARCHAR(100),
+    FOREIGN KEY (employee_id)
+        REFERENCES employees(employee_id)
 );
 
 -- ============================================
@@ -512,7 +535,7 @@ INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (10, '2026-08-31', 'Present');
 
 -- ============================================
--- INSERT LEAVE REQUESTS (ADDITIONAL DATA)
+-- INSERT LEAVE REQUESTS
 -- ============================================
 INSERT INTO leave_requests
 (employee_id, leave_date, reason, status)
@@ -542,7 +565,7 @@ VALUES
 (10, '2024-12-03', 'Vacation', 'Pending');
 
 -- ============================================
--- INSERT PAYROLL DATA (AUGUST 2026)
+-- INSERT PAYROLL DATA
 -- ============================================
 INSERT INTO payroll
 (employee_id, hours_worked, leave_deductions, final_salary)
@@ -559,19 +582,8 @@ VALUES
 (10, 162, 4, 57750.00);
 
 -- ============================================
--- ADDITIONAL DASHBOARD DATA - PERFORMANCE REVIEWS
+-- INSERT PERFORMANCE REVIEWS
 -- ============================================
-CREATE TABLE IF NOT EXISTS performance_reviews (
-    review_id INT PRIMARY KEY AUTO_INCREMENT,
-    employee_id INT NOT NULL,
-    review_date DATE NOT NULL,
-    score DECIMAL(3,1) CHECK (score >= 1 AND score <= 5),
-    feedback TEXT,
-    reviewer VARCHAR(100),
-    FOREIGN KEY (employee_id)
-        REFERENCES employees(employee_id)
-);
-
 INSERT INTO performance_reviews (employee_id, review_date, score, feedback, reviewer) VALUES
 (1, '2026-08-15', 5.0, 'Clear goals and great support from leadership. Sibongile consistently delivers high-quality code.', 'Naledi Moeketsi'),
 (2, '2026-08-14', 4.8, 'Excellent HR leadership. Lungile has improved employee satisfaction significantly.', 'Lungile Moyo'),
