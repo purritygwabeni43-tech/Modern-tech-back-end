@@ -33,12 +33,53 @@ export const getPayrollByEmployeeId = async (employee_id) => {
 
 
 // Add a payroll record
+// Add a payroll record
 export const createPayroll = async (
     employee_id,
     hours_worked,
     leave_deductions,
     final_salary
 ) => {
+
+    // Check if employee exists
+    const [employee] = await pool.query(
+        `SELECT employee_id
+         FROM employees
+         WHERE employee_id = ?`,
+        [employee_id]
+    );
+
+    if (employee.length === 0) {
+        const error = new Error(
+            "Employee does not exist."
+        );
+
+        error.code = "EMPLOYEE_NOT_FOUND";
+
+        throw error;
+    }
+
+
+    // Check if this employee already has payroll
+    const [existingPayroll] = await pool.query(
+        `SELECT payroll_id
+         FROM payroll
+         WHERE employee_id = ?`,
+        [employee_id]
+    );
+
+    if (existingPayroll.length > 0) {
+        const error = new Error(
+            "This employee already has a payroll record."
+        );
+
+        error.code = "DUPLICATE_EMPLOYEE_PAYROLL";
+
+        throw error;
+    }
+
+
+    // Create payroll
     const [result] = await pool.query(
         `INSERT INTO payroll
         (employee_id, hours_worked, leave_deductions, final_salary)
@@ -92,3 +133,4 @@ export const deletePayroll = async (payroll_id) => {
 
     return result;
 };
+

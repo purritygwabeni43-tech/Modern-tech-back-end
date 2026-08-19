@@ -74,9 +74,9 @@ export const getEmployeePayroll = async (req, res) => {
 };
 
 
-// POST - Add payroll
 export const addPayroll = async (req, res) => {
     try {
+
         const {
             employee_id,
             hours_worked,
@@ -84,20 +84,19 @@ export const addPayroll = async (req, res) => {
             final_salary
         } = req.body;
 
-
-        // Check that all fields were provided
+        // Validate required fields
         if (
-            employee_id === undefined ||
+            !employee_id ||
             hours_worked === undefined ||
             leave_deductions === undefined ||
             final_salary === undefined
         ) {
             return res.status(400).json({
-                message: "All payroll fields are required"
+                message: "All payroll fields are required."
             });
         }
 
-
+        // Create payroll
         const result = await createPayroll(
             employee_id,
             hours_worked,
@@ -105,17 +104,29 @@ export const addPayroll = async (req, res) => {
             final_salary
         );
 
-
-        res.status(201).json({
-            message: "Payroll record created successfully",
+        return res.status(201).json({
+            message: "Payroll created successfully.",
             payroll_id: result.insertId
         });
 
     } catch (error) {
-        console.error(error);
 
-        res.status(500).json({
-            message: "Failed to create payroll record"
+    if (error.code === "EMPLOYEE_NOT_FOUND") {
+        return res.status(404).json({
+            message: "Employee does not exist."
+        });
+    }
+
+    if (error.code === "DUPLICATE_EMPLOYEE_PAYROLL") {
+        return res.status(409).json({
+            message: "Already exists."
+        });
+    }
+
+    console.error("Error creating payroll:", error);
+
+    return res.status(500).json({
+        message: "Failed to create payroll."
         });
     }
 };
