@@ -50,26 +50,51 @@ exports.addEmployee = async (req, res) => {
     }
 };
 
-// 4. Update Employee
-exports.updateEmployee = async (req, res) => {
+// PUT /api/employees/:id
+exports.updateEmployee = (req, res) => {
     const { id } = req.params;
-    const { first_name, last_name, email, phone_number, job_title, department_id, salary, hire_date, employment_status } = req.body;
+    const { name, position, department_id, salary, contact } = req.body;
 
-    try {
-        const [result] = await db.query(
-            `UPDATE employees SET first_name = ?, last_name = ?, email = ?, phone_number = ?, job_title = ?, department_id = ?, salary = ?, hire_date = ?, employment_status = ?
-             WHERE employee_id = ?`,
-            [first_name, last_name, email, phone_number, job_title, department_id, salary, hire_date, employment_status, id]
-        );
+    // Must use employee_id in WHERE clause
+    const sql = `
+        UPDATE employees 
+        SET name = ?, position = ?, department_id = ?, salary = ?, contact = ?
+        WHERE employee_id = ?
+    `;
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Employee not found' });
+    db.query(sql, [name, position, department_id, salary, contact, id], (err, result) => {
+        if (err) {
+            console.error('Error updating employee in DB:', err);
+            return res.status(500).json({ error: err.message });
         }
 
-        res.status(200).json({ message: 'Employee updated successfully' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Employee not found or no changes made' });
+        }
+
+        res.json({ message: 'Employee updated successfully!' });
+    });
+};
+
+// Function in controllers/employeeController.js
+exports.updateEmployee = (req, res) => {
+    const { id } = req.params;
+    const { name, position, department_id, salary, employment_history, contact } = req.body;
+
+    // Must use 'name' instead of 'first_name' / 'last_name'
+    const sql = `
+        UPDATE employees 
+        SET name = ?, position = ?, department_id = ?, salary = ?, contact = ?
+        WHERE employee_id = ?
+    `;
+
+    db.query(sql, [name, position, department_id, salary, contact, id], (err, result) => {
+        if (err) {
+            console.error('Error updating employee:', err);
+            return res.status(500).json({ error: `Database Error: ${err.message}` });
+        }
+        res.json({ message: 'Employee updated successfully' });
+    });
 };
 
 // 5. Delete Employee
