@@ -1,49 +1,42 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+dotenv.config();
 
-    if (!token) {
+export const authenticate = (req, res, next) => {
+    const authorization = req.headers.authorization;
+    const [scheme, token] = authorization?.split(' ') || [];
+
+    if (scheme !== 'Bearer' || !token) {
         return res.status(401).json({
             success: false,
-            message: 'Access denied. No token provided.'
+            message: 'Authorization token is required'
         });
+    }
+
+    if (!process.env.JWT_SECRET) {
+        return next(new Error('JWT_SECRET is not configured'));
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
+        req.user = jwt.verify(token, process.env.JWT_SECRET);
         next();
     } catch (error) {
-        return res.status(403).json({
-            success: false,
-            message: 'Invalid or expired token'
-        });
+        const message = error.name === 'TokenExpiredError'
+            ? 'Authorization token has expired'
+            : 'Invalid authorization token';
+
+        return res.status(401).json({ success: false, message });
     }
 };
 
-const requireRole = (role) => {
-    return (req, res, next) => {
-        if (!req.user) {
-            return res.status(401).json({
-                success: false,
-                message: 'Unauthorized'
-            });
-        }
+export const authorize = (...roles) => (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+        return res.status(403).json({
+            success: false,
+            message: 'You do not have permission to access this resource'
+        });
+    }
 
-        if (req.user.role !== role) {
-            return res.status(403).json({
-                success: false,
-                message: `Access denied. ${role} role required.`
-            });
-        }
-
-        next();
-    };
-};
-
-module.exports = {
-    authenticateToken,
-    requireRole
+    next();
 };

@@ -2,12 +2,13 @@
 -- COMPLETE DATABASE SETUP FOR MODERNTECH HR
 -- MERGED: Your existing schema + Dashboard data
 -- ALL 10 EMPLOYEES WITH FULL ATTENDANCE
+-- Database: moderntech_hr
 -- ============================================
 
 -- ============================================
 -- SELECT THE DATABASE FIRST
 -- ============================================
-USE modern_tech;
+USE moderntech_hr;
 
 -- ============================================
 -- DROP OLD TABLES IF THEY EXIST (ORDER MATTERS)
@@ -114,7 +115,7 @@ CREATE TABLE payroll (
 );
 
 -- ============================================
--- CREATE PERFORMANCE REVIEWS TABLE (FIXED - MOVED BEFORE INSERT)
+-- CREATE PERFORMANCE REVIEWS TABLE
 -- ============================================
 CREATE TABLE performance_reviews (
     review_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -194,7 +195,7 @@ INSERT INTO users (full_name, email, password_hash, role_id) VALUES
 -- INSERT ATTENDANCE DATA (AUGUST 2026 - ALL 10 EMPLOYEES)
 -- ============================================
 
--- Employee 1: Sibongile Nkosi (22 present, 2 absent, 2 late, 1 leave)
+-- Employee 1: Sibongile Nkosi
 INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (1, '2026-08-01', 'Weekend'),
 (1, '2026-08-02', 'Present'),
@@ -228,7 +229,7 @@ INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (1, '2026-08-30', 'Present'),
 (1, '2026-08-31', 'Present');
 
--- Employee 2: Lungile Moyo (21 present, 1 absent, 3 late, 1 leave)
+-- Employee 2: Lungile Moyo
 INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (2, '2026-08-01', 'Weekend'),
 (2, '2026-08-02', 'Present'),
@@ -262,7 +263,7 @@ INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (2, '2026-08-30', 'Present'),
 (2, '2026-08-31', 'Present');
 
--- Employee 3: Thabo Molefe (23 present, 1 absent, 1 late, 1 leave)
+-- Employee 3: Thabo Molefe
 INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (3, '2026-08-01', 'Weekend'),
 (3, '2026-08-02', 'Present'),
@@ -296,7 +297,7 @@ INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (3, '2026-08-30', 'Present'),
 (3, '2026-08-31', 'Present');
 
--- Employee 4: Keshav Naidoo (20 present, 3 absent, 2 late, 1 leave)
+-- Employee 4: Keshav Naidoo
 INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (4, '2026-08-01', 'Weekend'),
 (4, '2026-08-02', 'Present'),
@@ -330,7 +331,7 @@ INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (4, '2026-08-30', 'Present'),
 (4, '2026-08-31', 'Present');
 
--- Employee 5: Zanele Khumalo (22 present, 1 absent, 2 late, 1 leave)
+-- Employee 5: Zanele Khumalo
 INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (5, '2026-08-01', 'Weekend'),
 (5, '2026-08-02', 'Present'),
@@ -364,7 +365,7 @@ INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (5, '2026-08-30', 'Present'),
 (5, '2026-08-31', 'Present');
 
--- Employee 6: Sipho Zulu (21 present, 2 absent, 2 late, 1 leave)
+-- Employee 6: Sipho Zulu
 INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (6, '2026-08-01', 'Weekend'),
 (6, '2026-08-02', 'Present'),
@@ -398,7 +399,7 @@ INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (6, '2026-08-30', 'Present'),
 (6, '2026-08-31', 'Present');
 
--- Employee 7: Naledi Moeketsi (23 present, 1 absent, 1 late, 1 leave)
+-- Employee 7: Naledi Moeketsi
 INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (7, '2026-08-01', 'Weekend'),
 (7, '2026-08-02', 'Present'),
@@ -432,7 +433,7 @@ INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (7, '2026-08-30', 'Present'),
 (7, '2026-08-31', 'Present');
 
--- Employee 8: Farai Gumbo (20 present, 2 absent, 3 late, 2 leave)
+-- Employee 8: Farai Gumbo
 INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (8, '2026-08-01', 'Weekend'),
 (8, '2026-08-02', 'Present'),
@@ -466,7 +467,7 @@ INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (8, '2026-08-30', 'Present'),
 (8, '2026-08-31', 'Present');
 
--- Employee 9: Karabo Dlamini (22 present, 1 absent, 2 late, 1 leave)
+-- Employee 9: Karabo Dlamini
 INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (9, '2026-08-01', 'Weekend'),
 (9, '2026-08-02', 'Present'),
@@ -500,7 +501,7 @@ INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (9, '2026-08-30', 'Present'),
 (9, '2026-08-31', 'Present');
 
--- Employee 10: Fatima Patel (21 present, 2 absent, 2 late, 1 leave)
+-- Employee 10: Fatima Patel
 INSERT INTO attendance (employee_id, attendance_date, status) VALUES
 (10, '2026-08-01', 'Weekend'),
 (10, '2026-08-02', 'Present'),

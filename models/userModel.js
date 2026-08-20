@@ -1,149 +1,138 @@
-const mysql = require('mysql2');
-const bcrypt = require('bcryptjs');
-require('dotenv').config();
+import db from '../config/db.js';
+import bcrypt from 'bcrypt';
 
-// Database connection
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-});
-
-db.connect((err) => {
-    if (err) {
-        console.error('Database connection failed:', err.message);
-        return;
-    }
-    console.log('User model connected to database');
-});
-
-// User Model - All database operations for users
-const UserModel = {
-    // Create a new user
-    create: (full_name, email, password, role_id) => {
-        return new Promise((resolve, reject) => {
-            // Check if email exists
-            db.query('SELECT id FROM users WHERE email = ?', [email], (err, results) => {
-                if (err) return reject(err);
-                if (results.length > 0) {
-                    return reject(new Error('Email already registered'));
-                }
-
-                // Hash password
-                const salt = bcrypt.genSaltSync(10);
-                const hashedPassword = bcrypt.hashSync(password, salt);
-
-                // Insert user
-                const query = `
-                    INSERT INTO users (full_name, email, password_hash, role_id)
-                    VALUES (?, ?, ?, ?)
-                `;
-                db.query(query, [full_name, email, hashedPassword, role_id || 3], (err, result) => {
-                    if (err) return reject(err);
-                    resolve({
-                        id: result.insertId,
-                        full_name,
-                        email,
-                        role_id: role_id || 3
-                    });
-                });
-            });
-        });
-    },
-
-    // Find user by email (for login)
-    findByEmail: (email) => {
-        return new Promise((resolve, reject) => {
-            const query = `
-                SELECT u.*, r.role_name
-                FROM users u
-                JOIN roles r ON u.role_id = r.id
-                WHERE u.email = ?
-            `;
-            db.query(query, [email], (err, results) => {
-                if (err) return reject(err);
-                resolve(results[0]);
-            });
-        });
+const User = {
+    // Find user by email with all details
+    findByEmail: async (email) => {
+        const query = `
+            SELECT 
+                u.id,
+                u.full_name,
+                u.email,
+                u.password_hash,
+                u.role_id,
+                r.role_name as role,
+                u.status,
+                u.last_login_at,
+                u.login_attempts,
+                u.locked_until,
+                u.created_at,
+                u.updated_at,
+                e.id as employee_id,
+                e.initials,
+                e.name as employee_name,
+                e.role as job_role,
+                e.department,
+                e.phone,
+                e.hire_date,
+                e.salary,
+                e.avatar_color,
+                e.status as employment_status
+            FROM users u
+            LEFT JOIN roles r ON u.role_id = r.id
+            LEFT JOIN employees e ON u.id = e.user_id
+            WHERE u.email = ?
+        `;
+        const rows = await db.query(query, [email]);
+        return rows[0] || null;
     },
 
     // Find user by ID
-    findById: (id) => {
-        return new Promise((resolve, reject) => {
-            const query = `
-                SELECT u.*, r.role_name
-                FROM users u
-                JOIN roles r ON u.role_id = r.id
-                WHERE u.id = ?
-            `;
-            db.query(query, [id], (err, results) => {
-                if (err) return reject(err);
-                resolve(results[0]);
-            });
-        });
+    findById: async (id) => {
+        const query = `
+            SELECT 
+                u.id,
+                u.full_name,
+                u.email,
+                u.role_id,
+                r.role_name as role,
+                u.status,
+                u.last_login_at,
+                u.created_at,
+                u.updated_at,
+                e.id as employee_id,
+                e.name as employee_name,
+                e.role as job_role,
+                e.department,
+                e.phone,
+                e.hire_date,
+                e.salary,
+                e.avatar_color
+            FROM users u
+            LEFT JOIN roles r ON u.role_id = r.id
+            LEFT JOIN employees e ON u.id = e.user_id
+            WHERE u.id = ?
+        `;
+        const rows = await db.query(query, [id]);
+        return rows[0] || null;
     },
 
-    // Get all users (for HR only)
-    findAll: () => {
-        return new Promise((resolve, reject) => {
-            const query = `
-                SELECT u.id, u.full_name, u.email, u.role_id, r.role_name, 
-                       u.created_at, u.updated_at
-                FROM users u
-                JOIN roles r ON u.role_id = r.id
-                ORDER BY u.id
-            `;
-            db.query(query, (err, results) => {
-                if (err) return reject(err);
-                resolve(results);
-            });
-        });
+    // Update last login
+    updateLastLogin: async (id) => {
+        const query = 'UPDATE users SET last_login_at = NOW() WHERE id = ?';
+        await db.query(query, [id]);
     },
 
-    // Update user role (HR only)
-    updateRole: (userId, roleId) => {
-        return new Promise((resolve, reject) => {
-            const query = 'UPDATE users SET role_id = ? WHERE id = ?';
-            db.query(query, [roleId, userId], (err, result) => {
-                if (err) return reject(err);
-                if (result.affectedRows === 0) {
-                    return reject(new Error('User not found'));
-                }
-                resolve({ message: 'User role updated successfully' });
-            });
-        });
+    // Reset login attempts
+    resetLoginAttempts: async (email) => {
+        const query = 'UPDATE users SET login_attempts = 0, locked_until = NULL WHERE email = ?';
+        await db.query(query, [email]);
     },
 
-    // Get user with employee details
-    getUserWithEmployee: (email) => {
-        return new Promise((resolve, reject) => {
-            const query = `
-                SELECT u.*, r.role_name, e.employee_id, e.name as employee_name,
-                       e.position, e.department_id, d.department_name
-                FROM users u
-                JOIN roles r ON u.role_id = r.id
-                LEFT JOIN employees e ON u.email = e.contact
-                LEFT JOIN departments d ON e.department_id = d.department_id
-                WHERE u.email = ?
-            `;
-            db.query(query, [email], (err, results) => {
-                if (err) return reject(err);
-                resolve(results[0]);
-            });
-        });
+    // Track login attempt
+    trackLoginAttempt: async (email, success, ip, userAgent) => {
+        const query = `
+            INSERT INTO login_attempts (email, ip_address, user_agent, success) 
+            VALUES (?, ?, ?, ?)
+        `;
+        await db.query(query, [email, ip, userAgent, success ? 1 : 0]);
+    },
+
+    // Get recent failed attempts
+    getRecentFailedAttempts: async (email, minutes = 15) => {
+        const query = `
+            SELECT COUNT(*) as attempts 
+            FROM login_attempts 
+            WHERE email = ? 
+            AND success = 0 
+            AND attempted_at > DATE_SUB(NOW(), INTERVAL ? MINUTE)
+        `;
+        const rows = await db.query(query, [email, minutes]);
+        return rows[0]?.attempts || 0;
+    },
+
+    // Check if account is locked
+    isAccountLocked: async (email) => {
+        const query = `
+            SELECT locked_until 
+            FROM users 
+            WHERE email = ? 
+            AND locked_until > NOW()
+        `;
+        const rows = await db.query(query, [email]);
+        return rows.length > 0;
+    },
+
+    // Lock account
+    lockAccount: async (email, minutes = 30) => {
+        const query = `
+            UPDATE users 
+            SET locked_until = DATE_ADD(NOW(), INTERVAL ? MINUTE)
+            WHERE email = ?
+        `;
+        await db.query(query, [minutes, email]);
     },
 
     // Verify password
-    verifyPassword: (plainPassword, hashedPassword) => {
-        return bcrypt.compareSync(plainPassword, hashedPassword);
+    verifyPassword: async (plainPassword, hashedPassword) => {
+        return await bcrypt.compare(plainPassword, hashedPassword);
     },
 
     // Hash password
-    hashPassword: (password) => {
-        const salt = bcrypt.genSaltSync(10);
-        return bcrypt.hashSync(password, salt);
+    hashPassword: async (password) => {
+        const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS) || 10;
+        return await bcrypt.hash(password, saltRounds);
     }
 };
 
-module.exports = UserModel;
+export default User;

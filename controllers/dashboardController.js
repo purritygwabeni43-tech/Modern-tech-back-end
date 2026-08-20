@@ -1,155 +1,117 @@
-const DashboardModel = require('../models/dashboardModel');
-const EmployeeModel = require('../models/employeeModel');
-const AttendanceModel = require('../models/attendanceModel');
-const PayrollModel = require('../models/payrollModel');
+import DashboardModel from '../models/dashboardModel.js';
 
-class DashboardController {
-    // Get complete dashboard data
-    static async getDashboard(req, res) {
-        try {
-            const dashboardData = await DashboardModel.getDashboardData();
-            
-            res.status(200).json({
-                success: true,
-                data: dashboardData
-            });
-        } catch (error) {
-            console.error('Dashboard controller error:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Error fetching dashboard data',
-                error: error.message
-            });
-        }
+export const getDashboardStats = async (req, res) => {
+    try {
+        const stats = await DashboardModel.getStats();
+        
+        res.json({
+            success: true,
+            data: stats
+        });
+    } catch (error) {
+        console.error('Dashboard stats error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch dashboard statistics'
+        });
     }
+};
 
-    // Get company health metrics
-    static async getCompanyHealth(req, res) {
-        try {
-            const data = await DashboardModel.getCompanyHealth();
-            res.status(200).json({
-                success: true,
-                data
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error fetching company health',
-                error: error.message
-            });
-        }
+export const getAttendanceChart = async (req, res) => {
+    try {
+        const data = await DashboardModel.getAttendanceChart();
+        
+        res.json({
+            success: true,
+            data
+        });
+    } catch (error) {
+        console.error('Attendance chart error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch attendance chart data'
+        });
     }
+};
 
-    // Get department performance
-    static async getDepartmentPerformance(req, res) {
-        try {
-            const data = await DashboardModel.getDepartmentPerformance();
-            res.status(200).json({
-                success: true,
-                data
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error fetching department performance',
-                error: error.message
-            });
-        }
+export const getDepartmentDistribution = async (req, res) => {
+    try {
+        const data = await DashboardModel.getDepartmentDistribution();
+        
+        res.json({
+            success: true,
+            data
+        });
+    } catch (error) {
+        console.error('Department distribution error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch department distribution'
+        });
     }
+};
 
-    // Get recent feedback
-    static async getRecentFeedback(req, res) {
-        try {
-            const data = await DashboardModel.getRecentFeedback();
-            res.status(200).json({
-                success: true,
-                data
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error fetching recent feedback',
-                error: error.message
-            });
-        }
+export const getRecentActivities = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const data = await DashboardModel.getRecentActivities(limit);
+        
+        res.json({
+            success: true,
+            data
+        });
+    } catch (error) {
+        console.error('Recent activities error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch recent activities'
+        });
     }
+};
 
-    // Get payroll summary
-    static async getPayrollSummary(req, res) {
-        try {
-            const data = await DashboardModel.getPayrollData();
-            res.status(200).json({
-                success: true,
-                data
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error fetching payroll data',
-                error: error.message
-            });
-        }
+export const getMonthlyAttendance = async (req, res) => {
+    try {
+        const month = req.query.month || null;
+        const data = await DashboardModel.getMonthlyAttendance(month);
+        
+        res.json({
+            success: true,
+            data
+        });
+    } catch (error) {
+        console.error('Monthly attendance error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch monthly attendance'
+        });
     }
+};
 
-    // Get attendance summary
-    static async getAttendanceSummary(req, res) {
-        try {
-            const data = await DashboardModel.getAttendanceSummary();
-            res.status(200).json({
-                success: true,
-                data
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error fetching attendance summary',
-                error: error.message
-            });
-        }
-    }
+export const getFullDashboard = async (req, res) => {
+    try {
+        const [stats, attendanceChart, departmentDistribution, recentActivities, monthlyAttendance] = await Promise.all([
+            DashboardModel.getStats(),
+            DashboardModel.getAttendanceChart(),
+            DashboardModel.getDepartmentDistribution(),
+            DashboardModel.getRecentActivities(10),
+            DashboardModel.getMonthlyAttendance()
+        ]);
 
-    // Get all employees
-    static async getAllEmployees(req, res) {
-        try {
-            const data = await EmployeeModel.getAllEmployees();
-            res.status(200).json({
-                success: true,
-                data
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error fetching employees',
-                error: error.message
-            });
-        }
-    }
-
-    // Get employee by ID with stats
-    static async getEmployeeById(req, res) {
-        try {
-            const { id } = req.params;
-            const data = await EmployeeModel.getEmployeeWithStats(id);
-            
-            if (!data) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Employee not found'
-                });
+        res.json({
+            success: true,
+            data: {
+                stats,
+                attendanceChart,
+                departmentDistribution,
+                recentActivities,
+                monthlyAttendance
             }
-            
-            res.status(200).json({
-                success: true,
-                data
-            });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error fetching employee',
-                error: error.message
-            });
-        }
+        });
+    } catch (error) {
+        console.error('Full dashboard error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch full dashboard data'
+        });
     }
-}
-
-module.exports = DashboardController;
+};
