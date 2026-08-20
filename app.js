@@ -5,12 +5,24 @@ const app = express();
 
 app.use(express.json());
 app.use(express.static(__dirname));
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
+    }
+
+    next();
+});
 
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: "modern_tech"
+    database: "modern_tech",
+    dateStrings: true
 });
 
 db.connect((err) => {
@@ -75,6 +87,114 @@ app.get("/attendance/:employeeId", (req, res) => {
 
         res.json(results);
     });
+});
+
+const attendanceStatuses = ["Present", "Absent", "Late", "Leave"];
+
+function validateAttendanceInput(body) {
+    const employeeId = Number(body.employee_id);
+    const attendanceDate = body.attendance_date;
+    const status = body.status;
+
+    if (!Number.isInteger(employeeId) || employeeId <= 0) {
+        return { error: "A valid employee is required" };
+    }
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(attendanceDate || "")) {
+        return { error: "A valid attendance date is required" };
+    }
+
+    if (!attendanceStatuses.includes(status)) {
+        return { error: "Status must be Present, Absent, Late, or Leave" };
+    }
+
+    return { employeeId, attendanceDate, status };
+}
+
+app.post("/attendance", (req, res) => {
+    const input = validateAttendanceInput(req.body);
+
+    if (input.error) {
+        return res.status(400).json({ error: input.error });
+    }
+
+    const sql = `
+        INSERT INTO attendance (employee_id, attendance_date, status)
+        VALUES (?, ?, ?)
+    `;
+
+    db.query(sql, [input.employeeId, input.attendanceDate, input.status], (err, result) => {
+        if (err) {
+            console.error("Create attendance error:", err);
+            return res.status(500).json({ error: "Failed to create attendance record" });
+        }
+
+        res.status(201).json({
+            message: "Attendance record created successfully",
+            attendance_id: result.insertId
+        });
+    });
+});
+
+app.put("/attendance/:attendanceId", (req, res) => {
+    const attendanceId = Number(req.params.attendanceId);
+    const input = validateAttendanceInput(req.body);
+
+    if (!Number.isInteger(attendanceId) || attendanceId <= 0) {
+        return res.status(400).json({ error: "A valid attendance record is required" });
+    }
+
+    if (input.error) {
+        return res.status(400).json({ error: input.error });
+    }
+
+    const sql = `
+        UPDATE attendance
+        SET employee_id = ?, attendance_date = ?, status = ?
+        WHERE attendance_id = ?
+    `;
+
+    db.query(
+        sql,
+        [input.employeeId, input.attendanceDate, input.status, attendanceId],
+        (err, result) => {
+            if (err) {
+                console.error("Update attendance error:", err);
+                return res.status(500).json({ error: "Failed to update attendance record" });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: "Attendance record not found" });
+            }
+
+            res.json({ message: "Attendance record updated successfully" });
+        }
+    );
+});
+
+app.delete("/attendance/:attendanceId", (req, res) => {
+    const attendanceId = Number(req.params.attendanceId);
+
+    if (!Number.isInteger(attendanceId) || attendanceId <= 0) {
+        return res.status(400).json({ error: "A valid attendance record is required" });
+    }
+
+    db.query(
+        "DELETE FROM attendance WHERE attendance_id = ?",
+        [attendanceId],
+        (err, result) => {
+            if (err) {
+                console.error("Delete attendance error:", err);
+                return res.status(500).json({ error: "Failed to delete attendance record" });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: "Attendance record not found" });
+            }
+
+            res.json({ message: "Attendance record deleted successfully" });
+        }
+    );
 });
 
 app.get("/leave-requests", (req, res) => {
