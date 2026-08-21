@@ -48,21 +48,21 @@ if (process.env.NODE_ENV !== "test") {
             console.log(
                 `MySQL connected to ${process.env.DB_NAME || "modern_tech2"}`
             );
+
+            app.listen(port, "0.0.0.0", () => {
+                console.log(
+                    `ModernTech server running on port ${port}`
+                );
+            });
         })
         .catch((error) => {
             console.error(
                 "MySQL connection failed:",
                 error.message
             );
-        })
-        .finally(() => {
-            app.listen(port, "0.0.0.0", () => {
-                console.log(
-                    `ModernTech server running on port ${port}`
-                );
-            });
+
+            process.exit(1);
         });
 }
 
 export default app;
-
