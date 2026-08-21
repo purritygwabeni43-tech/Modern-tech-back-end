@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModernTech - Employee Management</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+  <div class="app-layout">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <h2>ModernTech</h2>
+        <span class="sub-brand">HR Central Portal</span>
+      </div>
+      <nav class="navigation">
+        <a href="dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></a>
+        <a href="attendance.html" class="nav-item"><i class="fa-solid fa-calendar-check"></i><span>Attendance</span></a>
+        <a href="leave.html" class="nav-item"><i class="fa-solid fa-plane-departure"></i><span>Leave</span></a>
+        <a href="employees.html" class="nav-item active"><i class="fa-solid fa-users"></i><span>Employees</span></a>
+        <a href="payroll.html" class="nav-item"><i class="fa-solid fa-wallet"></i><span>Payslips</span></a>
+        <a href="reports.html" class="nav-item"><i class="fa-solid fa-file-invoice"></i><span>Reports</span></a>
+      </nav>
+      <div class="sidebar-account"><a href="login.html"><i class="fa-solid fa-right-to-bracket"></i><span>Login</span></a><button type="button" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i><span>Log Out</span></button></div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+      <header class="top-bar">
+        <div>
+          <h1>Employee Information Directory</h1>
+          <p class="sub-heading">Centralized profile registry mapped from system data channels.</p>
+        </div>
+        <button id="open-add-modal-btn" type="button" class="btn-primary">+ Add New Employee</button>
+      </header>
+
+      <div class="search-bar-container">
+        <input type="text" id="search-input" placeholder="Search employees by name, job position, or email...">
+      </div>
+
+      <!-- EMPLOYEE GRID -->
+      <div id="employee-container"></div>
+    </main>
+  </div>
+
+  <!-- ADD / EDIT MODAL OVERLAY -->
+  <div id="employee-modal" class="modal-overlay" style="display: none;">
+    <form id="employee-form" class="modal-box">
+      <h2 id="modal-title">Add New Employee</h2>
+      <input type="hidden" id="emp-id" />
+      
+      <label>Full Name</label>
+      <input type="text" id="emp-name" required />
+
+      <label>Position</label>
+      <input type="text" id="emp-position" required />
+
+     <label for="emp-department">Department</label>
+<select id="emp-department" required>
+    <option value="" disabled selected>Select a Department...</option>
+    <option value="1">Engineering / IT (Dept 1)</option>
+    <option value="2">Human Resources (Dept 2)</option>
+    <option value="3">Quality Assurance (Dept 3)</option>
+    <option value="4">Sales (Dept 4)</option>
+    <option value="5">Marketing & Content (Dept 5)</option>
+    <option value="6">UI/UX Design (Dept 6)</option>
+    <option value="7">Finance & Accounting (Dept 7)</option>
+    <option value="8">Customer Support (Dept 8)</option>
+</select>
+
+      <label>Salary (R)</label>
+      <input type="number" id="emp-salary" step="0.01" required />
+
+      <label>Employment History / Hire Info</label>
+      <input type="text" id="emp-history" placeholder="e.g. Joined in 2020" required />
+
+      <label>Email Contact</label>
+      <input type="email" id="emp-contact" required />
+
+      <div class="modal-buttons">
+        <button type="submit" class="btn-save">Save Employee</button>
+        <button type="button" id="close-modal-btn" class="btn-cancel">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- DETAILS MODAL OVERLAY -->
+  <div id="details-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <h2>Employee Details</h2>
+      <div id="details-body"></div>
+      <div class="modal-buttons">
+        <button type="button" id="close-details-btn" class="btn-cancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/employees.js"></script>
+</body>
+</html>

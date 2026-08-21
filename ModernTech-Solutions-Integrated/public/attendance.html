@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance | ModernTech HR Central Portal</title>
+  <link rel="stylesheet" href="css/leave.css">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-logo">MT</div><div><h2>ModernTech</h2><span>HR CENTRAL PORTAL</span></div></div>
+    <nav class="navigation">
+      <a href="dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></a>
+      <a href="attendance.html" class="nav-item active"><i class="fa-solid fa-calendar-check"></i><span>Attendance</span></a>
+      <a href="leave.html" class="nav-item"><i class="fa-solid fa-plane-departure"></i><span>Leave</span></a>
+      <a href="employees.html" class="nav-item"><i class="fa-solid fa-users"></i><span>Employees</span></a>
+      <a href="payroll.html" class="nav-item"><i class="fa-solid fa-wallet"></i><span>Payslips</span></a>
+      <a href="reports.html" class="nav-item"><i class="fa-solid fa-file-invoice"></i><span>Reports</span></a>
+    </nav>
+    <div class="sidebar-account"><a href="login.html"><i class="fa-solid fa-right-to-bracket"></i><span>Login</span></a><button type="button" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i><span>Log Out</span></button></div>
+    <div class="sidebar-help"><i class="fa-solid fa-headset"></i><div><strong>Need Help?</strong><small>Contact HR Support</small></div><i class="fa-solid fa-chevron-right"></i></div>
+  </aside>
+  <main class="main-content">
+    <header class="top-bar"><div class="breadcrumb">ModernTech <span>/</span> <strong>Attendance</strong></div><div class="top-right"><div class="live-status"><span class="live-dot"></span>Live</div></div></header>
+    <section class="page-container">
+      <div class="page-header"><div><h1>Attendance</h1><p>View and manage employee attendance records</p></div><button class="submit-btn" id="attendanceAddButton" type="button"><i class="fa-solid fa-plus"></i> Add Attendance</button></div>
+      <div class="summary-grid">
+        <div class="summary-card blue"><div class="summary-icon"><i class="fa-solid fa-user-check"></i></div><div><span>Present</span><h2 id="presentCount">0</h2><small>Records shown</small></div></div>
+        <div class="summary-card orange"><div class="summary-icon"><i class="fa-solid fa-clock"></i></div><div><span>Late</span><h2 id="lateCount">0</h2><small>Records shown</small></div></div>
+        <div class="summary-card"><div class="summary-icon"><i class="fa-solid fa-user-xmark"></i></div><div><span>Absent</span><h2 id="absentCount">0</h2><small>Records shown</small></div></div>
+      </div>
+      <div class="content-card">
+        <div class="section-heading table-heading"><div><h2>Attendance Records</h2><p>Live records from the MySQL attendance table.</p></div></div>
+        <div class="table-controls"><div class="table-search"><i class="fa-solid fa-magnifying-glass"></i><input id="attendanceSearch" type="text" placeholder="Search employee or status"></div><select id="attendanceStatus" class="status-filter"><option value="all">All statuses</option><option>Present</option><option>Late</option><option>Absent</option><option>Leave</option><option>Weekend</option></select></div>
+        <div class="table-container"><table><thead><tr><th>Employee</th><th>Position</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="attendanceBody"></tbody></table></div>
+        <div class="table-footer"><span id="attendanceResultCount"></span></div>
+      </div>
+    </section>
+  </main>
+  <div class="modal-overlay" id="attendanceModal" hidden><form class="modal-box" id="attendanceForm"><h2 id="attendanceModalTitle">Add Attendance</h2><label for="attendanceEmployee">Employee</label><select id="attendanceEmployee" required></select><label for="attendanceDate">Date</label><input id="attendanceDate" type="date" required><label for="attendanceRecordStatus">Status</label><select id="attendanceRecordStatus" required><option>Present</option><option>Late</option><option>Absent</option><option>Leave</option><option>Weekend</option></select><div class="form-actions"><button class="submit-btn" type="submit">Save Attendance</button><button class="secondary-btn" id="attendanceCancelButton" type="button">Cancel</button></div></form></div>
+  <script src="auth.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/attendance.js"></script>
+</body>
+</html>
+

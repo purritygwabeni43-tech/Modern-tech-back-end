@@ -1,0 +1,26 @@
+
+{
+  "name": "moderntech-solutions-integrated",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Integrated ModernTech HR portal - HTML frontend, Node/Express API and MySQL database",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "check": "node scripts/check.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.0",
+    "mysql2": "^3.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
+

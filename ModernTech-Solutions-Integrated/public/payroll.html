@@ -1,0 +1,1339 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HR Payroll Page</title>
+  <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+</head>
+<body class="dashboard-page">
+  <div class="dashboard-shell">
+    <aside class="sidebar">
+      <!-- Match employees.html nav and brand styling -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+      <div style="margin-bottom: 1.5rem; margin-top: 0.5rem; padding: 0 0.25rem; display: flex; align-items: center;">
+          <img src="logo-image.png" alt="ModernTech Logo" style="margin-right: 0.5rem; max-width: 100%; height: 42px; width: auto; object-fit: contain;">
+      </div>
+      <hr style="border-color: rgba(148, 163, 184, 0.12); margin-top: 0; margin-bottom: 1rem;">
+      
+      <nav class="emp-sidebar-nav" style="margin-bottom: 1.5rem;">
+          <button class="emp-nav-item " onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-chart-pie" style="margin-right: 0.5rem;"></i>Dashboard</button>
+          <button class="emp-nav-item " onclick="window.location.href='attendance.html'"><i class="fa-solid fa-calendar-check" style="margin-right: 0.5rem;"></i>Attendance</button>
+          <button class="emp-nav-item " onclick="window.location.href='leave.html'"><i class="fa-solid fa-plane-departure" style="margin-right: 0.5rem;"></i>Leave</button>
+          <button class="emp-nav-item " onclick="window.location.href='employees.html'"><i class="fa-solid fa-users" style="margin-right: 0.5rem;"></i>Employees</button>
+          <button class="emp-nav-item active" onclick="window.location.href='payroll.html'"><i class="fa-solid fa-wallet" style="margin-right: 0.5rem;"></i>Payslips</button>
+          <button class="emp-nav-item " onclick="window.location.href='reports.html'"><i class="fa-solid fa-file-invoice" style="margin-right: 0.5rem;"></i>Reports</button>
+      </nav>
+    <div class="sidebar-account"><a href="login.html"><i class="fa-solid fa-right-to-bracket"></i><span>Login</span></a><button type="button" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i><span>Log Out</span></button></div>
+
+      <div class="sidebar-note">
+        <h3>Automated payroll</h3>
+        <p>Attendance, deductions, and payslips are coordinated from the payroll data file.</p>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="dashboard-header">
+        <div>
+          <p class="eyebrow">Payroll operations</p>
+          <h1>ModernTech payroll automation</h1>
+          <p class="dashboard-copy">Track employee payroll, attendance status, and generate digital payslips automatically.</p>
+        </div>
+        <div>
+    <button class="primary-button" id="addPayroll">
+        Add Payroll
+    </button>
+
+    <button class="primary-button" id="downloadAll">
+        Download payroll summary
+    </button>
+</div>
+      </header>
+
+      <section class="summary-grid">
+        <article class="summary-card">
+          <span>Total payroll</span>
+          <strong id="totalPayroll">R0.00</strong>
+        </article>
+        <article class="summary-card">
+          <span>Average salary</span>
+          <strong id="averageSalary">R0.00</strong>
+        </article>
+        <article class="summary-card">
+          <span>Total leave deductions</span>
+          <strong id="totalLeaves">0 days</strong>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <article class="table-card">
+          <div class="card-header">
+            <div>
+              <h2>Payroll roster</h2>
+              <p>Calculated from the loaded payroll dataset.</p>
+            </div>
+            <span class="badge">Auto</span>
+          </div>
+          <div class="table-wrap">
+            <table class="payroll-table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Base Salary</th>
+                  <th>Hours</th>
+                  <th>Leaves</th>
+                  <th>Gross</th>
+                  <th>Deduction</th>
+                  <th>Net pay</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="payrollBody">
+                <tr><td colspan="8" class="loading-row">Loading payroll...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="info-card">
+          <h2>How automation works</h2>
+          <p>Payroll calculations can be automated using defined business rules such as hourly rates, attendance deductions, and approved bonuses.</p>
+
+          <div class="rule-block">
+            <p><strong>Hourly rate formula</strong></p>
+            <pre>hourlyRate = finalSalary / (hoursWorked - leaveDeductions)</pre>
+          </div>
+
+          <div class="rule-block">
+            <p><strong>Leave deduction</strong></p>
+            <pre>deduction = leaveDeductions × dailyRate</pre>
+          </div>
+
+          <div class="rule-block">
+            <p><strong>Net salary</strong></p>
+            <pre>netPay = gross - deduction</pre>
+          </div>
+
+          <button class="secondary-button" id="generateOne">Generate sample payslip</button>
+        </article>
+      </section>
+    </main>
+  </div>
+  <!-- ADD PAYROLL MODAL -->
+<div id="payrollModal" class="payroll-modal">
+    <div class="payroll-modal-content">
+
+        <div class="payroll-modal-header">
+            <div>
+                <p class="eyebrow">Payroll management</p>
+                <h2>Add Payroll Record</h2>
+                <p>Enter the payroll information for an employee.</p>
+            </div>
+
+            <button type="button" class="modal-close" id="closePayrollModal">
+                &times;
+            </button>
+        </div>
+
+        <form id="payrollForm">
+
+            <div class="modal-form-group">
+                <label for="modalEmployeeId">Employee</label>
+                <select id="modalEmployeeId" size="6" required>
+                    <option value="">Loading employees without payroll...</option>
+                </select>
+            </div>
+
+            <div class="modal-form-group">
+                <label for="modalHoursWorked">Hours Worked</label>
+                <input
+                    type="number"
+                    id="modalHoursWorked"
+                    placeholder="e.g. 160"
+                    min="0"
+                    required
+                >
+            </div>
+
+            <div class="modal-form-group">
+                <label for="modalLeaveDeductions">Leave Deductions</label>
+                <input
+                    type="number"
+                    id="modalLeaveDeductions"
+                    placeholder="e.g. 5"
+                    min="0"
+                    required
+                >
+            </div>
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="modal-cancel"
+                    id="cancelPayrollModal">
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button">
+                    Add Payroll
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+
+  <script src="js/axios-shim.js"></script>
+  <script src="auth.js"></script>
+    <script src="js/sidebar.js"></script>
+<script>
+    requireRole(["EMPLOYEE", "MANAGER", "HR"]);
+</script>
+  <script>
+
+
+    // ==========================================
+    // PAYROLL API
+    // ==========================================
+
+    const API_URL = "/payroll";
+
+    const hourlyRate = 450;
+    const dailyRate = hourlyRate * 8;
+
+    let payrollRecords = [];
+
+
+    // ==========================================
+    // FORMAT MONEY
+    // ==========================================
+
+    function formatMoney(value) {
+
+        return new Intl.NumberFormat("en-ZA", {
+            style: "currency",
+            currency: "ZAR"
+        }).format(Number(value) || 0);
+
+    }
+
+
+    // ==========================================
+    // UPDATE SUMMARY CARDS
+    // ==========================================
+
+    function setSummary(records) {
+
+        const totalPayroll = records.reduce(
+            (sum, record) =>
+                sum + Number(record.final_salary || 0),
+            0
+        );
+
+        const averageSalary = records.length
+            ? totalPayroll / records.length
+            : 0;
+
+        const totalLeaves = records.reduce(
+            (sum, record) =>
+                sum + Number(record.leave_deductions || 0),
+            0
+        );
+
+        document.getElementById("totalPayroll").textContent =
+            formatMoney(totalPayroll);
+
+        document.getElementById("averageSalary").textContent =
+            formatMoney(averageSalary);
+
+        document.getElementById("totalLeaves").textContent =
+            `${totalLeaves} days`;
+
+    }
+
+
+    // ==========================================
+    // CREATE PAYSLIP TEXT
+    // ==========================================
+
+    function createPayslipText(employee) {
+
+        const employeeId = employee.employee_id;
+
+        const hoursWorked =
+            Number(employee.hours_worked || 0);
+
+        const leaveDeductions =
+            Number(employee.leave_deductions || 0);
+
+        const finalSalary =
+            Number(employee.final_salary || 0);
+
+        const denominator =
+            hoursWorked - leaveDeductions;
+
+        const derivedHourlyRate =
+            denominator > 0
+                ? finalSalary / denominator
+                : 0;
+
+        const gross =
+            hoursWorked * derivedHourlyRate;
+
+        const deduction =
+            leaveDeductions * dailyRate;
+
+        return [
+
+            "ModernTech Solutions",
+            "HR Payroll Payslip",
+            "------------------------",
+
+            `Employee ID: ${employeeId}`,
+
+            `Hours Worked: ${hoursWorked}`,
+
+            `Leave Deductions: ${leaveDeductions} days`,
+
+            `Hourly Rate: ${formatMoney(derivedHourlyRate)}`,
+
+            `Gross Pay: ${formatMoney(gross)}`,
+
+            `Leave Penalty: ${formatMoney(deduction)}`,
+
+            `Net Pay: ${formatMoney(finalSalary)}`,
+
+            "------------------------",
+
+            "This digital payslip was generated automatically from the ModernTech Payroll System."
+
+        ].join("\n");
+
+    }
+
+
+    // ==========================================
+    // DOWNLOAD TEXT FILE
+    // ==========================================
+
+    function downloadTextFile(filename, content) {
+
+        const blob = new Blob(
+            [content],
+            { type: "text/plain" }
+        );
+
+        const link =
+            document.createElement("a");
+
+        link.href =
+            URL.createObjectURL(blob);
+
+        link.download =
+            filename;
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+    }
+
+
+    // ==========================================
+    // GENERATE ONE PAYSLIP
+    // ==========================================
+
+    function generatePayslip(employee) {
+
+        const filename =
+            `payslip-${employee.employee_id}.doc`;
+
+        const content =
+            createPayslipText(employee);
+
+        downloadTextFile(
+            filename,
+            content
+        );
+
+    }
+
+
+    // ==========================================
+    // GENERATE PAYROLL SUMMARY
+    // ==========================================
+
+    function generatePayrollSummary(records) {
+
+        const lines = records.map((record) => {
+
+            const employeeId = record.employee_id;
+            const employeeName = record.employee_name || record.name || "Unknown employee";
+            const baseSalary = Number(record.salary || record.base_salary || 0);
+
+            const hoursWorked =
+                Number(record.hours_worked || 0);
+
+            const leaveDeductions =
+                Number(record.leave_deductions || 0);
+
+            const finalSalary =
+                Number(record.final_salary || 0);
+
+            const denominator =
+                hoursWorked - leaveDeductions;
+
+            const derivedHourlyRate =
+                denominator > 0
+                    ? finalSalary / denominator
+                    : 0;
+
+            const gross =
+                hoursWorked * derivedHourlyRate;
+
+            const deduction =
+                leaveDeductions * dailyRate;
+
+            return [
+
+                `Employee ${employeeId}`,
+
+                `  Hours Worked: ${hoursWorked}`,
+
+                `  Leave Deductions: ${leaveDeductions} days`,
+
+                `  Hourly Rate: ${formatMoney(derivedHourlyRate)}`,
+
+                `  Gross Pay: ${formatMoney(gross)}`,
+
+                `  Deduction: ${formatMoney(deduction)}`,
+
+                `  Net Pay: ${formatMoney(finalSalary)}`,
+
+                ""
+
+            ].join("\n");
+
+        });
+
+        const content = [
+
+            "ModernTech Payroll Summary",
+
+            "===========================",
+
+            "",
+
+            ...lines
+
+        ].join("\n");
+
+        downloadTextFile(
+            "payroll-summary.doc",
+            content
+        );
+
+    }
+
+
+    // ==========================================
+    // DISPLAY PAYROLL TABLE
+    // ==========================================
+
+    function renderPayrollTable(records) {
+
+        const body =
+            document.getElementById("payrollBody");
+
+        body.innerHTML = "";
+
+
+        if (records.length === 0) {
+
+            body.innerHTML = `
+                <tr>
+                    <td colspan="8" class="loading-row">
+                        No payroll records found.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        records.forEach((record) => {
+
+            const payrollId =
+                record.payroll_id;
+
+            const employeeId = record.employee_id;
+            const employeeName = record.employee_name || record.name || "Unknown employee";
+            const baseSalary = Number(record.salary || record.base_salary || 0);
+
+            const hoursWorked =
+                Number(record.hours_worked || 0);
+
+            const leaveDeductions =
+                Number(record.leave_deductions || 0);
+
+            const finalSalary =
+                Number(record.final_salary || 0);
+
+
+            const derivedHourlyRate = Number(record.hourly_rate || (baseSalary / 160));
+            const gross = Number(record.gross_salary || (hoursWorked * derivedHourlyRate));
+            const deduction = Number(record.deduction_amount || (leaveDeductions * derivedHourlyRate * 8));
+
+
+            const row =
+                document.createElement("tr");
+
+
+            row.innerHTML = `
+
+                <td><strong>${employeeName}</strong><small class="employee-id-label">#${employeeId}</small></td>
+
+                <td>${formatMoney(baseSalary)}</td>
+
+                <td>${hoursWorked}</td>
+
+                <td>${leaveDeductions}</td>
+
+                <td>${formatMoney(gross)}</td>
+
+                <td class="deduction-value">
+                    ${formatMoney(deduction)}
+                </td>
+
+                <td>${formatMoney(finalSalary)}</td>
+
+                <td>
+
+                    <button
+                        class="text-button"
+                        onclick="editPayroll(${payrollId})">
+                        Edit
+                    </button>
+
+                    <button
+                        class="text-button"
+                        onclick="deletePayroll(${payrollId})">
+                        Delete
+                    </button>
+
+                    <button
+                        class="text-button"
+                        onclick="generatePayslipById(${payrollId})">
+                        Generate
+                    </button>
+
+                </td>
+
+            `;
+
+            body.appendChild(row);
+
+        });
+
+    }
+
+
+    // ==========================================
+    // GET ALL PAYROLL
+    // ==========================================
+
+    async function loadPayrollData() {
+
+        try {
+
+            console.log(
+                "Loading payroll data from:",
+                API_URL
+            );
+
+
+            const response =
+                await axios.get(API_URL);
+
+
+            console.log(
+                "Payroll API response:",
+                response.data
+            );
+
+
+            payrollRecords =
+                response.data;
+
+
+            setSummary(
+                payrollRecords
+            );
+
+
+            renderPayrollTable(
+                payrollRecords
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Error loading payroll:",
+                error
+            );
+
+
+            const body =
+                document.getElementById("payrollBody");
+
+
+            body.innerHTML = `
+                <tr>
+                    <td
+                        colspan="8"
+                        class="error-row">
+
+                        Unable to load payroll
+                        data from the backend.
+
+                    </td>
+                </tr>
+            `;
+
+        }
+
+    }
+
+    async function loadEligibleEmployees() {
+        const employeeSelect = document.getElementById("modalEmployeeId");
+        employeeSelect.innerHTML = '<option value="">Loading employees without payroll...</option>';
+        try {
+            const response = await axios.get(`${API_URL}/eligible-employees`);
+            const employees = response.data;
+            employeeSelect.innerHTML = employees.length
+                ? employees.map((employee) => `<option value="${employee.employee_id}">${employee.name} (#${employee.employee_id}) - ${formatMoney(employee.salary)} base salary</option>`).join('')
+                : '<option value="">All employees already have payroll</option>';
+            employeeSelect.disabled = employees.length === 0;
+        } catch (error) {
+            employeeSelect.innerHTML = '<option value="">Unable to load eligible employees</option>';
+            employeeSelect.disabled = true;
+            console.error("Error loading eligible employees:", error);
+        }
+    }
+
+
+  // ==========================================
+// ADD PAYROLL MODAL
+// ==========================================
+
+const payrollModal = document.getElementById("payrollModal");
+
+const payrollForm = document.getElementById("payrollForm");
+
+const closePayrollModal =
+    document.getElementById("closePayrollModal");
+
+const cancelPayrollModal =
+    document.getElementById("cancelPayrollModal");
+
+
+// ==========================================
+// OPEN MODAL
+// ==========================================
+
+async function openPayrollModal() {
+
+    payrollModal.classList.add("active");
+    await loadEligibleEmployees();
+    document.getElementById("modalEmployeeId").focus();
+}
+
+
+// ==========================================
+// CLOSE MODAL
+// ==========================================
+
+function closePayrollModalFunction() {
+
+    payrollModal.classList.remove("active");
+
+    payrollForm.reset();
+}
+
+
+// ==========================================
+// CLOSE BUTTON
+// ==========================================
+
+closePayrollModal.addEventListener(
+    "click",
+    closePayrollModalFunction
+);
+
+
+// ==========================================
+// CANCEL BUTTON
+// ==========================================
+
+cancelPayrollModal.addEventListener(
+    "click",
+    closePayrollModalFunction
+);
+
+
+// ==========================================
+// CLICK OUTSIDE MODAL
+// ==========================================
+
+payrollModal.addEventListener(
+    "click",
+    (event) => {
+
+        if (event.target === payrollModal) {
+
+            closePayrollModalFunction();
+
+        }
+
+    }
+);
+
+
+// ==========================================
+// ADD PAYROLL FORM SUBMIT
+// ==========================================
+
+payrollForm.addEventListener(
+    "submit",
+    async (event) => {
+
+        event.preventDefault();
+
+
+        const employee_id =
+            Number(
+                document.getElementById("modalEmployeeId").value
+            );
+
+
+        const hours_worked =
+            Number(
+                document.getElementById("modalHoursWorked").value
+            );
+
+
+        const leave_deductions =
+            Number(
+                document.getElementById("modalLeaveDeductions").value
+            );
+
+
+
+        // Basic validation
+
+        if (!employee_id) {
+
+            alert("Please enter an Employee ID.");
+
+            return;
+
+        }
+
+
+        if (hours_worked < 0) {
+
+            alert("Hours worked cannot be negative.");
+
+            return;
+
+        }
+
+
+        if (leave_deductions < 0) {
+
+            alert("Leave deductions cannot be negative.");
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await axios.post(
+                    API_URL,
+                    {
+                        employee_id: employee_id,
+                        hours_worked: hours_worked,
+                        leave_deductions: leave_deductions
+                    }
+                );
+
+
+            alert(
+                response.data.message ||
+                "Payroll record added successfully."
+            );
+
+
+            // Close modal
+
+            closePayrollModalFunction();
+
+
+            // Reload payroll from MySQL
+
+            await loadPayrollData();
+
+
+        } catch (error) {
+
+            console.error(
+                "Error adding payroll:",
+                error
+            );
+
+
+            alert(
+                error.response?.data?.message ||
+                "Failed to add payroll record."
+            );
+
+        }
+
+    }
+);
+
+
+// ==========================================
+// EDIT PAYROLL
+// ==========================================
+
+async function editPayroll(payrollId) {
+
+    // Find the payroll record
+    const payroll = payrollRecords.find(
+        record =>
+            Number(record.payroll_id) === Number(payrollId)
+    );
+
+
+    // Make sure the record exists
+    if (!payroll) {
+
+        alert("Payroll record not found.");
+
+        return;
+    }
+
+
+    // ==========================================
+    // CREATE EDIT MODAL
+    // ==========================================
+
+    const overlay = document.createElement("div");
+
+    overlay.className = "edit-payroll-overlay";
+
+
+    overlay.innerHTML = `
+
+        <div class="edit-payroll-content">
+
+            <!-- HEADER -->
+
+            <div class="edit-payroll-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        Payroll management
+                    </p>
+
+                    <h2>
+                        Edit Payroll
+                    </h2>
+
+                    <p>
+                        Update the payroll information for this employee.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="edit-payroll-close"
+                    id="closeEditPayroll">
+
+                    &times;
+
+                </button>
+
+            </div>
+
+
+            <!-- FORM -->
+
+            <div class="edit-payroll-form">
+
+
+                <!-- EMPLOYEE ID -->
+
+                <div class="edit-payroll-form-group">
+
+                    <label for="editEmployeeId">
+                        Employee ID
+                    </label>
+
+                    <input
+                        type="number"
+                        id="editEmployeeId"
+                        value="${payroll.employee_id}"
+                        min="1"
+                    >
+
+                </div>
+
+
+                <!-- HOURS -->
+
+                <div class="edit-payroll-form-group">
+
+                    <label for="editHoursWorked">
+                        Hours Worked
+                    </label>
+
+                    <input
+                        type="number"
+                        id="editHoursWorked"
+                        value="${payroll.hours_worked}"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <!-- LEAVE -->
+
+                <div class="edit-payroll-form-group">
+
+                    <label for="editLeaveDeductions">
+                        Leave Deductions
+                    </label>
+
+                    <input
+                        type="number"
+                        id="editLeaveDeductions"
+                        value="${payroll.leave_deductions}"
+                        min="0"
+                    >
+
+                </div>
+
+
+                <!-- BUTTONS -->
+
+                <div class="edit-payroll-actions">
+
+                    <button
+                        type="button"
+                        class="edit-payroll-cancel"
+                        id="cancelEditPayroll">
+
+                        Cancel
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="edit-payroll-save"
+                        id="saveEditPayroll">
+
+                        Save Changes
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    // Add modal to page
+    document.body.appendChild(overlay);
+
+
+    // ==========================================
+    // CLOSE MODAL
+    // ==========================================
+
+    function closeEditModal() {
+
+        overlay.remove();
+
+    }
+
+
+    // ==========================================
+    // CLOSE X BUTTON
+    // ==========================================
+
+    document
+        .getElementById("closeEditPayroll")
+        .addEventListener(
+            "click",
+            closeEditModal
+        );
+
+
+    // ==========================================
+    // CANCEL BUTTON
+    // ==========================================
+
+    document
+        .getElementById("cancelEditPayroll")
+        .addEventListener(
+            "click",
+            closeEditModal
+        );
+
+
+    // ==========================================
+    // CLICK OUTSIDE MODAL
+    // ==========================================
+
+    overlay.addEventListener(
+        "click",
+        function(event) {
+
+            if (event.target === overlay) {
+
+                closeEditModal();
+
+            }
+
+        }
+    );
+
+
+    // ==========================================
+    // SAVE CHANGES
+    // ==========================================
+
+    document
+        .getElementById("saveEditPayroll")
+        .addEventListener(
+            "click",
+            async function() {
+
+
+                // ==========================================
+                // GET FORM VALUES
+                // ==========================================
+
+                const employee_id =
+                    Number(
+                        document.getElementById(
+                            "editEmployeeId"
+                        ).value
+                    );
+
+
+                const hours_worked =
+                    Number(
+                        document.getElementById(
+                            "editHoursWorked"
+                        ).value
+                    );
+
+
+                const leave_deductions =
+                    Number(
+                        document.getElementById(
+                            "editLeaveDeductions"
+                        ).value
+                    );
+
+
+
+                // ==========================================
+                // VALIDATION
+                // ==========================================
+
+                if (!employee_id) {
+
+                    alert(
+                        "Please enter an Employee ID."
+                    );
+
+                    return;
+                }
+
+
+                if (hours_worked <= 0) {
+
+                    alert(
+                        "Hours worked must be greater than 0."
+                    );
+
+                    return;
+                }
+
+
+                if (leave_deductions < 0) {
+
+                    alert(
+                        "Leave deductions cannot be negative."
+                    );
+
+                    return;
+                }
+
+
+                // ==========================================
+                // SEND PUT REQUEST
+                // ==========================================
+
+                try {
+
+                    const response =
+                        await axios.put(
+                            `${API_URL}/${payrollId}`,
+                            {
+                                employee_id: employee_id,
+                                hours_worked: hours_worked,
+                                leave_deductions: leave_deductions
+                            }
+                        );
+
+
+                    console.log(
+                        "Payroll updated:",
+                        response.data
+                    );
+
+
+                    // ==========================================
+                    // SUCCESS MESSAGE
+                    // ==========================================
+
+                    alert(
+                        response.data.message ||
+                        "Payroll updated successfully."
+                    );
+
+
+                    // ==========================================
+                    // CLOSE MODAL
+                    // ==========================================
+
+                    closeEditModal();
+
+
+                    // ==========================================
+                    // REFRESH TABLE
+                    // ==========================================
+
+                    await loadPayrollData();
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Error updating payroll:",
+                        error
+                    );
+
+
+                    alert(
+                        error.response?.data?.message ||
+                        "Failed to update payroll record."
+                    );
+
+                }
+
+            }
+        );
+
+}
+
+    // ==========================================
+    // DELETE PAYROLL
+    // ==========================================
+
+    async function deletePayroll(payrollId) {
+
+        const confirmDelete =
+            confirm(
+                "Are you sure you want to delete this payroll record?"
+            );
+
+
+        if (!confirmDelete) {
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await axios.delete(
+                    `${API_URL}/${payrollId}`
+                );
+
+
+            alert(
+                response.data.message
+            );
+
+
+            // Reload data from MySQL
+
+            await loadPayrollData();
+
+
+        } catch (error) {
+
+            console.error(
+                "Error deleting payroll:",
+                error
+            );
+
+
+            alert(
+                error.response?.data?.message ||
+                "Failed to delete payroll record."
+            );
+
+        }
+
+    }
+
+
+    // ==========================================
+    // GENERATE PAYSLIP BY PAYROLL ID
+    // ==========================================
+
+    function generatePayslipById(payrollId) {
+
+        const employee =
+            payrollRecords.find(
+                record =>
+                    Number(record.payroll_id) ===
+                    Number(payrollId)
+            );
+
+
+        if (!employee) {
+
+            alert(
+                "Payroll record not found."
+            );
+
+            return;
+        }
+
+
+        generatePayslip(employee);
+
+    }
+
+
+    // ==========================================
+    // GENERATE SAMPLE PAYSLIP
+    // ==========================================
+
+    document
+        .getElementById("generateOne")
+        .addEventListener(
+            "click",
+            () => {
+
+                if (payrollRecords.length > 0) {
+
+                    generatePayslip(
+                        payrollRecords[0]
+                    );
+
+                } else {
+
+                    alert(
+                        "No payroll records available."
+                    );
+
+                }
+
+            }
+        );
+
+
+    // ==========================================
+    // DOWNLOAD ALL PAYROLL
+    // ==========================================
+
+    document
+        .getElementById("downloadAll")
+        .addEventListener(
+            "click",
+            () => {
+
+                if (payrollRecords.length > 0) {
+
+                    generatePayrollSummary(
+                        payrollRecords
+                    );
+
+                } else {
+
+                    alert(
+                        "No payroll records available."
+                    );
+
+                }
+
+            }
+        );
+
+
+    // ==========================================
+    // ADD PAYROLL BUTTON
+    // ==========================================
+
+   document
+    .getElementById("addPayroll")
+    .addEventListener(
+        "click",
+        openPayrollModal
+    );
+
+    // ==========================================
+    // LOAD DATA WHEN PAGE OPENS
+    // ==========================================
+
+    loadPayrollData();
+
+</script>
+</body>
+</html>
+

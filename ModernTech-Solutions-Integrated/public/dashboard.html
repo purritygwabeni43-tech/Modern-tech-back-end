@@ -1,0 +1,340 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern Tech Solutions | Company Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <!-- Match employees.html nav and brand styling -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+        <div style="margin-bottom: 1.5rem; margin-top: 0.5rem; padding: 0 0.25rem; display: flex; align-items: center;">
+            <img src="logo-image.png" alt="ModernTech Logo" style="margin-right: 0.5rem; max-width: 100%; height: 42px; width: auto; object-fit: contain;">
+        </div>
+        <hr style="border-color: rgba(148, 163, 184, 0.12); margin-top: 0; margin-bottom: 1rem;">
+        
+        <nav class="emp-sidebar-nav" style="margin-bottom: 1.5rem;">
+
+    <button
+        class="emp-nav-item active"
+        id="navDashboard"
+        onclick="window.location.href='dashboard.html'">
+        <i class="fa-solid fa-chart-pie" style="margin-right: 0.5rem;"></i>
+        Dashboard
+    </button>
+
+    <button
+        class="emp-nav-item"
+        id="navAttendance"
+        onclick="window.location.href='attendance.html'">
+        <i class="fa-solid fa-calendar-check" style="margin-right: 0.5rem;"></i>
+        Attendance
+    </button>
+
+      <button class="emp-nav-item" id="navLeave" onclick="window.location.href='leave.html'">
+        <i class="fa-solid fa-plane-departure" style="margin-right: 0.5rem;"></i>
+        Leave
+      </button>
+
+    <button
+        class="emp-nav-item"
+        id="navEmployees"
+        onclick="window.location.href='employees.html'">
+        <i class="fa-solid fa-users" style="margin-right: 0.5rem;"></i>
+        Employees
+    </button>
+
+    <button
+        class="emp-nav-item"
+        id="navPayroll"
+        onclick="window.location.href='payroll.html'">
+        <i class="fa-solid fa-wallet" style="margin-right: 0.5rem;"></i>
+        Payslips
+    </button>
+
+    <button
+        class="emp-nav-item"
+        id="navReports"
+        onclick="window.location.href='reports.html'">
+        <i class="fa-solid fa-file-invoice" style="margin-right: 0.5rem;"></i>
+        Reports
+    </button>
+
+</nav>
+
+        <div class="sidebar-bottom">
+
+  <div class="sidebar-card">
+    <p class="small-label">This month</p>
+    <strong>12 open roles</strong>
+    <p>Hiring across engineering and design.</p>
+  </div>
+
+  <div class="sidebar-account"><a href="login.html"><i class="fa-solid fa-right-to-bracket"></i><span>Login</span></a><button type="button" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i><span>Log Out</span></button></div>
+
+</div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+    <div>
+        <p class="eyebrow">People & operations overview</p>
+
+        <h1 id="dashboardTitle">
+            Company dashboard
+        </h1>
+
+        <p id="userRoleDisplay" class="dashboard-copy"></p>
+    </div>
+
+    <button id="createReportBtn" class="primary-btn" onclick="window.location.href='reports.html'">
+        + Create report
+    </button>
+</header>
+
+        <section class="hero-grid">
+          <article class="hero-card">
+            <p class="eyebrow">Company health</p>
+            <h3 id="healthHeadline">Company health from live HR data.</h3>
+            <p id="healthSummary">Attendance, reviews, employees, leave, and payroll are loaded from the connected modules.</p>
+            <div class="hero-metrics">
+              <div>
+                <strong id="metricAttendance">—</strong>
+                <span>Attendance</span>
+              </div>
+              <div>
+                <strong id="metricPulse">—</strong>
+                <span>Pulse score</span>
+              </div>
+              <div>
+                <strong id="metricEmployees">—</strong>
+                <span>Employees</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="card chart-card">
+            <div class="card-head">
+              <div>
+                <p class="small-label">Review trend</p>
+                <h4>Performance reviews</h4>
+              </div>
+              <span class="pill" id="reviewCountPill">Live</span>
+            </div>
+            <svg viewBox="0 0 320 140" class="line-chart" aria-label="Quarterly growth chart">
+              <path d="M10 110 C50 100, 80 80, 110 88 S175 110, 210 72 S270 40, 310 30" />
+              <circle cx="110" cy="88" r="4" />
+              <circle cx="210" cy="72" r="4" />
+              <circle cx="310" cy="30" r="4" />
+            </svg>
+          </article>
+        </section>
+
+        <section class="stats-grid">
+          <article class="card stat-card">
+            <p class="small-label">Employees</p>
+            <h3 id="statEmployees">—</h3>
+              <span class="positive" id="employeeStatDetail">Live employee count</span>
+          </article>
+          <article class="card stat-card">
+            <p class="small-label">Avg. review score</p>
+            <h3 id="statReview">—</h3>
+            <span class="positive">Live review average</span>
+          </article>
+          <article class="card stat-card">
+            <p class="small-label">Open tasks</p>
+            <h3 id="statTasks">—</h3>
+            <span id="statTasksDetail" class="neutral">Live pending leave</span>
+          </article>
+          <article class="card stat-card">
+            <p class="small-label">Payroll processed</p>
+            <h3 id="statPayroll">—</h3>
+            <span class="positive">Live payroll total</span>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <p class="small-label">Team health</p>
+                <h4>Employee performance</h4>
+              </div>
+            </div>
+            <div class="progress-list" id="departmentPerformance"><p>Loading department performance...</p></div>
+          </article>
+
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <p class="small-label">Reviews</p>
+                <h4>Recent employee feedback</h4>
+              </div>
+            </div>
+            <div class="review-list" id="recentFeedback"><p>Loading recent reviews...</p></div>
+          </article>
+        </section>
+      </main>
+    </div>
+    <script src="auth.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script>
+
+    // Get the logged-in user
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    // If nobody is logged in, send them back to login
+    if (!user) {
+        window.location.href = "login.html";
+    }
+
+    // Get the user's role
+    const role = user.role.toUpperCase();
+
+    console.log("Logged-in user:", user);
+    console.log("User role:", role);
+
+
+    // Get navigation elements
+    const navEmployees = document.getElementById("navEmployees");
+    const navReports = document.getElementById("navReports");
+    const createReportBtn = document.getElementById("createReportBtn");
+
+
+    // Display user information
+    const userRoleDisplay =
+        document.getElementById("userRoleDisplay");
+
+    userRoleDisplay.textContent =
+        `Welcome, ${user.username} | Role: ${role}`;
+
+
+    /*
+        EMPLOYEE
+        Employees cannot see:
+        - Employees page
+        - Reports
+        - Create report
+    */
+
+    if (role === "EMPLOYEE") {
+
+        navEmployees.style.display = "none";
+        navReports.style.display = "none";
+        createReportBtn.style.display = "none";
+
+    }
+
+
+    /*
+        MANAGER
+        Managers can see:
+        - Dashboard
+        - Attendance
+        - Employees
+        - Payslips
+        - Reports
+        - Create report
+    */
+
+    else if (role === "MANAGER") {
+
+        navEmployees.style.display = "flex";
+        navReports.style.display = "flex";
+        createReportBtn.style.display = "block";
+
+    }
+
+
+    /*
+        HR
+        HR can see everything.
+    */
+
+    else if (role === "HR") {
+
+        navEmployees.style.display = "flex";
+        navReports.style.display = "flex";
+        createReportBtn.style.display = "block";
+
+    }
+
+
+    /*
+        Unknown role
+        If something unexpected is stored in the database,
+        don't give the user access to management features.
+    */
+
+    else {
+
+        console.warn("Unknown user role:", role);
+
+        navEmployees.style.display = "none";
+        navReports.style.display = "none";
+        createReportBtn.style.display = "none";
+
+    }
+
+</script>
+<script>
+function logout() {
+    // Remove logged-in user
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+
+    // Redirect to login page
+    window.location.href = "login.html";
+}
+</script>
+  
+<script>
+async function loadDashboardData() {
+    try {
+        const response = await fetch('/dashboard');
+        const payload = await response.json();
+        if (!response.ok || !payload.success) return;
+        const data = payload.data;
+        document.getElementById('metricAttendance').textContent = `${Number(data.companyHealth.attendance || 0).toFixed(1)}%`;
+        document.getElementById('metricPulse').textContent = `${Number(data.companyHealth.pulseScore || 0).toFixed(1)}/5`;
+        document.getElementById('metricEmployees').textContent = data.companyHealth.totalEmployees ?? 0;
+        document.getElementById('healthHeadline').textContent = `${Number(data.companyHealth.attendance || 0).toFixed(1)}% attendance across the company.`;
+        document.getElementById('healthSummary').textContent = `${data.reviews.total ?? 0} performance reviews and ${data.leave.pending ?? 0} pending leave requests are tracked from MySQL.`;
+        document.getElementById('statEmployees').textContent = data.employeeStats.totalEmployees ?? 0;
+        document.getElementById('employeeStatDetail').textContent = `Average salary R${Number(data.employeeStats.averageSalary || 0).toLocaleString('en-ZA')}`;
+        document.getElementById('statReview').textContent = `${Number(data.employeeStats.avgReviewScore || 0).toFixed(1)}/5`;
+        document.getElementById('statTasks').textContent = data.openTasks.total ?? 0;
+        document.getElementById('statTasksDetail').textContent = `${data.openTasks.needAction ?? 0} need action`;
+        const payroll = Number(data.payroll.totalPayroll || 0);
+        document.getElementById('statPayroll').textContent = payroll >= 1000 ? `R${Math.round(payroll/1000)}k` : `R${payroll.toLocaleString()}`;
+        document.getElementById('reviewCountPill').textContent = `${data.reviews.total ?? 0} reviews`;
+
+        const departments = document.getElementById('departmentPerformance');
+        if (Array.isArray(data.departmentPerformance) && data.departmentPerformance.length) {
+            departments.innerHTML = data.departmentPerformance.map(item => {
+                const score = Math.max(0, Math.min(100, Number(item.performance_score || 0)));
+                return `<div class="progress-item"><div class="row-label"><span>${item.department}</span><strong>${Math.round(score)}%</strong></div><div class="bar"><span style="width: ${score}%"></span></div></div>`;
+            }).join('');
+        }
+
+        const feedback = document.getElementById('recentFeedback');
+        if (Array.isArray(data.recentFeedback) && data.recentFeedback.length) {
+            feedback.innerHTML = data.recentFeedback.map(item => `<div class="review-item"><div><strong>${item.name}.</strong><p>“${item.feedback || ''}”</p></div><span class="pill">${Number(item.score || 0).toFixed(1)}</span></div>`).join('');
+        }
+    } catch (error) {
+        console.warn('Dashboard API unavailable:', error.message);
+    }
+}
+loadDashboardData();
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,9 @@
+
+import { pool } from '../config/db.js';
+async function all(search=''){ const q=`%${search}%`; const [rows]=await pool.query(`SELECT e.*,d.department_name AS department FROM employees e LEFT JOIN departments d ON d.department_id=e.department_id WHERE e.name LIKE ? OR e.position LIKE ? OR e.contact LIKE ? OR d.department_name LIKE ? ORDER BY e.employee_id`,[q,q,q,q]); return rows; }
+async function byId(id){ const [rows]=await pool.query(`SELECT e.*,d.department_name AS department FROM employees e LEFT JOIN departments d ON d.department_id=e.department_id WHERE e.employee_id=?`,[id]); return rows[0]||null; }
+async function create(data){ const [r]=await pool.query(`INSERT INTO employees(name,position,department_id,salary,employment_history,contact) VALUES(?,?,?,?,?,?)`,[data.name,data.position,data.department_id,data.salary,data.employment_history||null,data.contact]); return r.insertId; }
+async function update(id,data){ const [r]=await pool.query(`UPDATE employees SET name=?,position=?,department_id=?,salary=?,employment_history=?,contact=? WHERE employee_id=?`,[data.name,data.position,data.department_id,data.salary,data.employment_history||null,data.contact,id]); return r; }
+async function remove(id){ const conn=await pool.getConnection(); try{await conn.beginTransaction(); await conn.query('DELETE FROM performance_reviews WHERE employee_id=?',[id]); await conn.query('DELETE FROM payroll WHERE employee_id=?',[id]); await conn.query('DELETE FROM leave_requests WHERE employee_id=?',[id]); await conn.query('DELETE FROM attendance WHERE employee_id=?',[id]); await conn.query('DELETE FROM users WHERE employee_id=?',[id]); const [r]=await conn.query('DELETE FROM employees WHERE employee_id=?',[id]); await conn.commit(); return r;}catch(e){await conn.rollback();throw e}finally{conn.release()} }
+export { all, byId, create, update, remove };
+
