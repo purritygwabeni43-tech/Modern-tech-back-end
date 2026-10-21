@@ -6,20 +6,20 @@ Install these first:
 - Node.js 18 or newer
 - MySQL Server 8.x
 - MySQL Workbench (recommended for importing the database)
-- Use `npm install`
+- Use `npm install` in the `backend/` folder
 
 ## 2. Create the MySQL database
 1. Start the MySQL Server service.
 2. Open MySQL Workbench and connect to your local MySQL server.
-3. Open `database/modern_tech.sql`.
+3. Open `backend/database/modern_tech.sql`.
 4. Run the whole SQL script.
-5. Refresh **Schemas** and confirm that `modern_tech` exists.
+5. Refresh **Schemas** and confirm that `modern_tech2` exists.
 6. Confirm these tables exist: `roles`, `departments`, `employees`, `users`, `attendance`, `leave_requests`, `payroll`, `performance_reviews`.
 
 > The setup SQL drops and recreates the ModernTech project tables, so do not run it against a database containing data you need to keep.
 
 ## 3. Configure `.env`
-Open `.env` in the project root and update the MySQL credentials if necessary:
+Copy `backend/.env.example` to `backend/.env` and update the MySQL credentials if necessary:
 
 ```env
 PORT=5000
@@ -37,7 +37,7 @@ NODE_ENV=development
 If your MySQL `root` account has a password, put it after `DB_PASSWORD=`.
 
 ## 4. Install Node dependencies
-Open Command Prompt / PowerShell inside the project folder and run:
+Open Command Prompt / PowerShell inside the `backend/` folder and run:
 
 ```bash
 npm install
@@ -54,13 +54,13 @@ You should see messages similar to:
 
 ```text
 MySQL connected to modern_tech2
-ModernTech running on http://localhost:3000
+ModernTech server running on port 5000
 ```
 
 Then open:
 
 ```text
-http://localhost:3000
+http://localhost:5000
 ```
 
 Do not open the HTML files by double-clicking them. The frontend should be opened through the Express server so its API calls can reach Node/MySQL.
@@ -93,14 +93,13 @@ MySQL Server is not running. On Windows, open **Services**, find a service such 
 The username/password in `.env` does not match your MySQL account. Fix `DB_USER` and `DB_PASSWORD`, then restart `npm start`.
 
 ### `Unknown database 'modern_tech2'`
-Run `database/modern_tech.sql` in MySQL Workbench first.
+Run `backend/database/modern_tech.sql` in MySQL Workbench first.
 
 ### Port 3000 is already in use
-Change `PORT=3000` to another port such as `PORT=3001` in `.env`, restart the server, then open that new port. The frontend uses relative API URLs, so no frontend code changes are required.
+Change `PORT=5000` in `backend/.env`, restart the server, then open the configured port. The frontend uses relative API URLs, so no frontend code changes are required.
 
 ### `npm` is not recognized
 Install Node.js and reopen the terminal.
 
 ### Page loads but data is empty/erroring
-Open `http://localhost:5000/health`. If it reports `database: Disconnected`, fix the MySQL/.env configuration first.
-
+Open `http://localhost:5000/health`. If it reports `database: Disconnected`, fix the MySQL settings in `backend/.env` first.

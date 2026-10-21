@@ -1,7 +1,11 @@
 
 # ModernTech Solutions — Integrated HR Portal
 
-This folder merges the supplied ModernTech branches into one runnable project while preserving the supplied frontend designs. It uses a single Node/Express server and a single MySQL database.
+The project separates the web interface and API into `frontend/` and `backend/` while preserving the supplied frontend designs. The backend serves the frontend and API from one Express server, using a single MySQL database.
+
+## Project structure
+- `frontend/` — HTML, CSS, and browser JavaScript
+- `backend/` — Express API, database scripts, and Node.js configuration
 
 ## Included modules
 - Login/authentication (username or email, role-aware user data)
@@ -15,11 +19,11 @@ This folder merges the supplied ModernTech branches into one runnable project wh
 
 ## Quick start
 1. Install Node.js 18+ and MySQL 8+.
-2. In MySQL Workbench, open `database/modern_tech.sql` and run the entire script.
-3. Edit `.env` if your MySQL username/password/port differ from the defaults.
-4. Open a terminal in this project folder and run `npm install`.
-5. Run `npm start`.
-6. Browse to `http://localhost:3000`.
+2. In MySQL Workbench, open `backend/database/modern_tech.sql` and run the entire script.
+3. Copy `backend/.env.example` to `backend/.env` if needed, then update the MySQL credentials.
+4. Open a terminal in the `backend/` folder and run `npm install`.
+5. Run `npm start` from `backend/`.
+6. Browse to `http://localhost:5000` (or the port configured in `backend/.env`).
 
 ## Demo logins
 - Employee: `sibo.nkosi` / `Sibo123`
@@ -30,8 +34,7 @@ This folder merges the supplied ModernTech branches into one runnable project wh
 On a successful first login, legacy demo plaintext passwords are automatically replaced in MySQL with bcrypt hashes.
 
 ## Environment variables
-See `.env.example`. For local MySQL with no root password, the included `.env` works as-is. If your MySQL root account has a password, put it in `DB_PASSWORD`.
+See `backend/.env.example`. The local `backend/.env` is not committed. Set your own database credentials and JWT secret there.
 
 ## Important deployment note
-The frontend and API are designed to be served together by this Express server. Netlify can host static HTML, but it cannot run this persistent Node/MySQL server directly. For production, host the Node API on a Node-capable service and use a managed MySQL database, then adjust frontend API URLs if frontend/backend are separated.
-
+The backend serves the frontend, so the browser can use same-origin API URLs without extra frontend configuration. Netlify can host static HTML, but it cannot run this persistent Node/MySQL server directly. For production, host the Node API on a Node-capable service and use a managed MySQL database.

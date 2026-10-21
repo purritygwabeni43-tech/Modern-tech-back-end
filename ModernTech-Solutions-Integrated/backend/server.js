@@ -15,14 +15,15 @@ import authRoutes from './routes/authRoutes.js';
 import performanceRoutes from './routes/performanceRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
 
-dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '.env') });
 const app = express();
+const frontendDirectory = path.resolve(__dirname, '..', 'frontend');
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(frontendDirectory));
 
 app.get('/health', async (req, res) => {
 	try { await testConnection(); res.json({ success: true, status: 'OK', database: process.env.DB_NAME || 'modern_tech2' }); }
@@ -36,7 +37,7 @@ app.use('/dashboard', dashboardRoutes);
 app.use('/departments', departmentRoutes);
 app.use('/auth', authRoutes);
 app.use('/performance', performanceRoutes);
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/', (req, res) => res.sendFile(path.join(frontendDirectory, 'login.html')));
 app.use((req, res) => res.status(404).json({ success: false, message: 'Endpoint not found.' }));
 app.use(errorHandler);
 
