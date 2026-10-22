@@ -54,6 +54,7 @@ if (process.env.NODE_ENV !== "test") {
                 console.log(
                     `ModernTech server running on port ${port}`
                 );
+                console.log(`Local: http://localhost:${port}`);
             });
         })
         .catch((error) => {
